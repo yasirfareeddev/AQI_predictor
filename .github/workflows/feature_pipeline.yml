@@ -1,0 +1,42 @@
+name: Hourly Feature Update
+on:
+  schedule:
+    - cron: '0 * * * *'  # Every hour (UTC)
+  workflow_dispatch:      # Manual trigger for testing
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch latest data
+        run: python src/fetch_data.py
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          API_KEY: ${{ secrets.API_KEY }}
+          CITY: ${{ secrets.CITY }}
+
+      - name: Compute & store features
+        run: python src/feature_pipeline.py
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          API_KEY: ${{ secrets.API_KEY }}
+          CITY: ${{ secrets.CITY }}
