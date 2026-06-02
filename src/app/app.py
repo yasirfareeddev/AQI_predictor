@@ -438,7 +438,12 @@ div[data-testid="stAlert"] {
 BASE_DIR = Path(__file__).parent.parent.parent 
 @st.cache_resource
 def get_mongo_client():
-    uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+    # Try Streamlit Cloud secrets first, then local .env, then fallback to localhost
+    try:
+        uri = st.secrets["MONGO_URI"]
+    except (KeyError, FileNotFoundError):
+        uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+    
     return MongoClient(uri)
 
 @st.cache_resource
