@@ -15,7 +15,7 @@ load_dotenv()
 
 st.set_page_config(
     page_title="ATMOS · AQI Monitor",
-    page_icon="🌍",
+    page_icon="https://img.icons8.com/color/96/air-quality.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -594,6 +594,10 @@ def main():
             'color:#6a6860;letter-spacing:1px;">RMSE 1.23 · R² 0.995</p>',
             unsafe_allow_html=True
         )
+            # Sidebar toggle button
+        if st.button("☰ Menu", key="toggle_sidebar"):
+            st.session_state.show_sidebar = not st.session_state.get('show_sidebar', True)
+            st.rerun()
 
     st.markdown('<hr class="hline">', unsafe_allow_html=True)
 
