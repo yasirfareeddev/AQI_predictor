@@ -435,7 +435,7 @@ div[data-testid="stAlert"] {
 
 
 # ─── Helpers ────────────────────────────────────────────────────────────────
-
+BASE_DIR = Path(__file__).parent.parent.parent 
 @st.cache_resource
 def get_mongo_client():
     uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
@@ -444,19 +444,14 @@ def get_mongo_client():
 @st.cache_resource
 def load_model():
     try:
-        # Get the directory where app.py is located
-        current_dir = Path(__file__).parent.parent  # Goes up to project root
-        
-        # Build absolute paths
-        models_path = current_dir / 'data' / 'all_models.pkl'
-        weights_path = current_dir / 'data' / 'ensemble_weights.pkl'
+        models_path = BASE_DIR / 'data' / 'all_models.pkl'
+        weights_path = BASE_DIR / 'data' / 'ensemble_weights.pkl'
         
         models = joblib.load(models_path)
         weights = joblib.load(weights_path)
         return models, weights
     except FileNotFoundError as e:
         st.error(f"Model files not found. Error: {e}")
-        st.error(f"Looking in: {current_dir / 'data'}")
         return None, None
 
 def get_latest_features(city="Islamabad"):
@@ -489,7 +484,7 @@ def predict_next_3_days(latest_features, models, weights):
             if k not in ['_id', 'timestamp', 'city', 'target_aqi']:
                 if isinstance(current[k], (int, float)):
                     current[k] += np.random.normal(0, 0.02 * abs(current[k]))
-        feature_cols_path = Path(__file__).parent.parent / 'data' / 'feature_cols.pkl'
+        feature_cols_path = BASE_DIR / 'data' / 'feature_cols.pkl'
         feature_cols = joblib.load(feature_cols_path)
         X = pd.DataFrame([current])[feature_cols]
         ind = {n: m.predict(X)[0] for n, m in models.items()}
@@ -912,8 +907,8 @@ def main():
     # ── Feature Importance ────────────────────────────────────────────────────
     st.markdown('<p class="sec-label">Feature Importance</p>', unsafe_allow_html=True)
     try:
-        fi_path = Path(__file__).parent.parent / 'data' / 'feature_importance.pkl'
-        fi = joblib.load(fi_path)
+        fi_path = BASE_DIR / 'data' / 'feature_importance.pkl'
+        feature_importance = joblib.load(fi_path)
 
         fig_fi = go.Figure(go.Bar(
             x=top['importance'],

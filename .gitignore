@@ -35,8 +35,6 @@ Thumbs.db
 # Jupyter notebooks (optional - uncomment if needed)
 # notebooks/.ipynb_checkpoints/
 
-*.pkl
-data/*.pkl
 __pycache__/
 *.pyc
 .env
