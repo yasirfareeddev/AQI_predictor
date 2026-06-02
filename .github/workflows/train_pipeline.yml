@@ -27,6 +27,27 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Backfill historical data
+        run: python src/backfill_data.py
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          API_KEY: ${{ secrets.API_KEY }}
+          CITY: ${{ secrets.CITY }}
+
+      - name: Compute features
+        run: python src/feature_pipeline.py
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          API_KEY: ${{ secrets.API_KEY }}
+          CITY: ${{ secrets.CITY }}
+
+      - name: Prepare training data
+        run: python src/prepare_data.py
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          API_KEY: ${{ secrets.API_KEY }}
+          CITY: ${{ secrets.CITY }}
+
       - name: Retrain & evaluate model
         run: python src/train_model.py
         env:
