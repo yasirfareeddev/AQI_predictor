@@ -914,6 +914,7 @@ def main():
     try:
         fi_path = BASE_DIR / 'data' / 'feature_importance.pkl'
         feature_importance = joblib.load(fi_path)
+        top = feature_importance.head(12)
 
         fig_fi = go.Figure(go.Bar(
             x=top['importance'],
